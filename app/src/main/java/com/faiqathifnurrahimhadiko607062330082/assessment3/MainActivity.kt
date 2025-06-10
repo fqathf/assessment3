@@ -3,45 +3,27 @@ package com.faiqathifnurrahimhadiko607062330082.assessment3
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.faiqathifnurrahimhadiko607062330082.assessment3.ui.theme.Assessment3Theme
+// Impor MainScreen. Sesuaikan path jika berbeda.
+import com.faiqathifnurrahimhadiko607062330082.assessment3.ui.screen.MainScreen
+import com.faiqathifnurrahimhadiko607062330082.assessment3.ui.theme.Assessment3Theme // Ganti dengan nama tema Anda
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            Assessment3Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            Assessment3Theme { // Ganti dengan nama tema aplikasi Anda
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MainScreen() // Memanggil MainScreen
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Assessment3Theme {
-        Greeting("Android")
     }
 }

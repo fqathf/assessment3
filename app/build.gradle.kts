@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mobpro1"
+    namespace = "com.faiqathifnurrahimhadiko607062330082.assessment3"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.mobpro1"
+        applicationId = "com.faiqathifnurrahimhadiko607062330082.assesment3"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -71,6 +71,8 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.android.image.cropper)
+    implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.androidx.runtime.livedata)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
