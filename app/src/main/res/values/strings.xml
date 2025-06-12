@@ -20,4 +20,19 @@
     <string name="liverpool_players">Liverpool Players</string>
     <string name="no_players_found">No players found.</string>
     <string name="retry">Retry</string>
+    <string name="app_info_description">App Information</string>
+    <string name="refresh_data">Refresh Data</string>
+    <string name="app_information">Application Information</string>
+    <string name="app_info_details">This application displays a list of Liverpool FC players fetched from an API. Developed as part of Assessment 3.</string>
+    <string name="tambah_pemain">Tambah Pemain</string>
+    <string name="tambah_pemain_baru">Tambah Pemain Baru</string>
+    <string name="nama_pemain">Nama Pemain</string>
+    <string name="posisi">Posisi</string>
+    <string name="kebangsaan">Kebangsaan</string>
+    <string name="jumlah_gol">Jumlah Gol</string>
+    <string name="url_gambar_pemain">URL Gambar Pemain</string>
+    <string name="tambah">Tambah</string>
+    <string name="data_kosong">Tidak ada data pemain.</string>
+    <string name="gagal_muat">Gagal memuat data. Coba lagi nanti.</string>
+    <string name="nomor_punggung">Nomor Punggung</string>
 </resources>

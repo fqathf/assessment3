@@ -37,4 +37,10 @@ class UserDataStore(private val context: Context) {
             preferences[USER_PHOTO] = user.photoUrl
         }
     }
+
+    suspend fun clearData() {
+        context.dataStore.edit { preferences ->
+            preferences.clear() // Menghapus semua preferensi pengguna
+        }
+    }
 }

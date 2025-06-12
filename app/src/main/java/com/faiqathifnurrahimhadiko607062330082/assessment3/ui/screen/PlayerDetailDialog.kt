@@ -35,7 +35,7 @@ fun PlayerDetailDialog(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(player.photoUrl) // Menggunakan photoUrl dari model Player
+                        .data(player.image) // Menggunakan photoUrl dari model Player
                         .crossfade(true)
                         .build(),
                     contentDescription = player.name,
