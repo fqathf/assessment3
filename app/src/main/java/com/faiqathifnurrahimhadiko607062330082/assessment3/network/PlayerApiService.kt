@@ -14,62 +14,59 @@ import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
-import retrofit2.http.Query
+import retrofit2.http.Path
 
-// Base URL dari API
-private const val BASE_URL = "https://lfc-player-api.vercel.app/"
+private const val BASE_URL = "https://apimobpromobil-production.up.railway.app/api/"
 
-// Inisialisasi Moshi untuk parsing JSON
-// KotlinJsonAdapterFactory memungkinkan Moshi bekerja dengan data class Kotlin
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
     .build()
 
-// Inisialisasi Retrofit
-// MoshiConverterFactory digunakan untuk mengkonversi JSON response menjadi objek Kotlin
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(MoshiConverterFactory.create(moshi))
     .baseUrl(BASE_URL)
     .build()
 
-// Interface yang mendefinisikan endpoint API
-interface LfcApiService {
-    /**
-     * Mengambil daftar semua pemain Liverpool.
-     * Response berupa List dari objek Player.
-     */
-    @GET("players") // Endpoint untuk mendapatkan semua pemain
-    suspend fun getPlayers(): List<Player>
+interface PlayerApiService {
+    @GET("players")
+    suspend fun getPlayers(
+        @Header("Authorization") authToken: String
+    ): List<Player>
 
-    // Contoh metode POST (TIDAK AKAN BERFUNGSI DENGAN API SAAT INI)
-    // Mengasumsikan endpoint "players" juga digunakan untuk POST,
-    // dan memerlukan otorisasi serta data pemain dalam format multipart.
     @Multipart
-    @POST("players") // Atau endpoint spesifik untuk POST jika berbeda
+    @POST("players/store")
     suspend fun addPlayer(
-        @Header("Authorization") authToken: String, // Contoh otorisasi
-        @Part("name") name: RequestBody,
-        @Part("position") position: RequestBody,
-        @Part("number") number: RequestBody, // Angka bisa dikirim sebagai RequestBody
-        @Part("nationality") nationality: RequestBody,
-        @Part photo: MultipartBody.Part? = null // Foto pemain, opsional
+        @Header("Authorization") authToken: String,
+        @Part("nama") nama: RequestBody,
+        @Part("posisi") posisi: RequestBody,
+        @Part foto: MultipartBody.Part
     ): OpStatus
 
-    // Contoh metode DELETE (TIDAK AKAN BERFUNGSI DENGAN API SAAT INI)
-    // Mengasumsikan endpoint "players" digunakan untuk DELETE dengan ID pemain sebagai query parameter.
-    @DELETE("players") // Atau endpoint spesifik untuk DELETE jika berbeda
+    @DELETE("players/{id}")
     suspend fun deletePlayer(
-        @Header("Authorization") authToken: String, // Contoh otorisasi
-        @Query("id") playerId: String // ID pemain yang akan dihapus
+        @Header("Authorization") authToken: String,
+        @Path("id") id: String
+    ): OpStatus
+
+    @Multipart
+    @POST("players/{id}")
+    suspend fun updatePlayer(
+        @Header("Authorization") authToken: String,
+        @Part("nama") name: RequestBody,
+        @Part("posisi") position: RequestBody,
+        @Part foto: MultipartBody.Part,
+        @Path("id") id: String
     ): OpStatus
 }
 
-// Objek singleton untuk menyediakan instance dari LfcApiService
-object LfcApi {
-    val service: LfcApiService by lazy {
-        retrofit.create(LfcApiService::class.java)
+object PlayerApi {
+    val service: PlayerApiService by lazy {
+        retrofit.create(PlayerApiService::class.java)
+    }
+
+    fun getPlayerPhotoUrl(photoId: String): String {
+        return "https://apimobpromobil-production.up.railway.app/storage/$photoId"
     }
 }
 
-// (Opsional) Enum untuk status pemanggilan API, bisa digunakan di ViewModel
-enum class LfcApiStatus { LOADING, SUCCESS, FAILED }
+enum class PlayerApiStatus { LOADING, SUCCESS, FAILED }

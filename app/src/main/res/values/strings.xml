@@ -35,4 +35,7 @@
     <string name="data_kosong">Tidak ada data pemain.</string>
     <string name="gagal_muat">Gagal memuat data. Coba lagi nanti.</string>
     <string name="nomor_punggung">Nomor Punggung</string>
+    <string name="home">Home</string>
+    <string name="main">Profile</string>
+    <string name="player_image">Gambar Pemain</string>
 </resources>

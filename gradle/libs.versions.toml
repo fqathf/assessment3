@@ -17,6 +17,7 @@ datastorePreferences = "1.1.4"
 androidImageCropper = "4.5.0"
 media3CommonKtx = "1.7.1"
 runtimeLivedata = "1.8.2"
+navCompose ="2.8.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +46,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 android-image-cropper = { module = "com.vanniktech:android-image-cropper", version.ref="androidImageCropper" }
 androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navCompose"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

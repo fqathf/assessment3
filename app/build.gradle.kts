@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.android.image.cropper)
     implementation(libs.androidx.media3.common.ktx)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

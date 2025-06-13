@@ -1,17 +1,12 @@
 package com.faiqathifnurrahimhadiko607062330082.assessment3.ui.screen
 
-import android.content.ContentResolver
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
 import android.graphics.drawable.BitmapDrawable
-import android.os.Build
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,10 +25,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -41,7 +34,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -68,7 +60,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,10 +76,6 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import com.canhub.cropper.CropImageContract
-import com.canhub.cropper.CropImageContractOptions
-import com.canhub.cropper.CropImageOptions
-import com.canhub.cropper.CropImageView
 import com.faiqathifnurrahimhadiko607062330082.assessment3.BuildConfig
 import com.faiqathifnurrahimhadiko607062330082.assessment3.R
 import com.faiqathifnurrahimhadiko607062330082.assessment3.model.Player
@@ -110,7 +97,7 @@ import java.net.URL
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun HomeScreen() {
     val context = LocalContext.current
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
@@ -122,21 +109,6 @@ fun MainScreen() {
     val coroutineScope = rememberCoroutineScope()
 
     var showDialog by remember { mutableStateOf(false) }
-    var showPlayerDialog by remember { mutableStateOf(false) }
-
-    var bitmap: Bitmap? by remember { mutableStateOf(null) }
-    val launcher = rememberLauncherForActivityResult(CropImageContract()) {
-        bitmap = getCroppedImage(context.contentResolver, it)
-        if (bitmap != null) showPlayerDialog = true
-    }
-
-    LaunchedEffect(itemToEdit) {
-        itemToEdit?.let { player ->
-            coroutineScope.launch(Dispatchers.IO) {
-                bitmapToEdit = loadBitmapFromUrl(context, PlayerApi.getPlayerPhotoUrl(player.foto))
-            }
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -166,64 +138,21 @@ fun MainScreen() {
                     }
                 }
             )
-        },
-        floatingActionButton = {
-            if (user.email.isNotEmpty()) {
-                FloatingActionButton(onClick = {
-                    val options = CropImageContractOptions(
-                        null, CropImageOptions(
-                            imageSourceIncludeGallery = true,
-                            imageSourceIncludeCamera = true,
-                            fixAspectRatio = true
-                        )
-                    )
-                    launcher.launch(options)
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(id = R.string.tambah_pemain)
-                    )
-                }
-            }
         }
     ) { innerPadding ->
-        if (user.email.isNotEmpty()) {
-            ScreenContent(
-                viewModel = viewModel,
-                userId = user.email,
-                modifier = Modifier.padding(innerPadding)
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Silahkan login terlebih dahulu untuk mengakses fitur pemain",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-        }
+        ScreenContentHome(
+            viewModel = viewModel,
+            userId = user.email,
+            modifier = Modifier.padding(innerPadding)
+        )
 
         if (showDialog) {
             ProfilDialog(
                 user = user,
-                onDismissRequest = { showDialog = false }) {
+                onDismissRequest = { showDialog = false }
+            ) {
                 CoroutineScope(Dispatchers.IO).launch { signOut(context, dataStore) }
                 showDialog = false
-            }
-        }
-
-        if (showPlayerDialog) {
-            PlayerDialog(
-                bitmap = bitmap,
-                onDismissRequest = { showPlayerDialog = false }) { nama, posisi ->
-                viewModel.saveData(user.email, nama, posisi, bitmap!!)
-                showPlayerDialog = false
             }
         }
 
@@ -235,12 +164,16 @@ fun MainScreen() {
 }
 
 @Composable
-fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier = Modifier) {
+fun ScreenContentHome(
+    viewModel: MainViewModel,
+    userId: String,
+    modifier: Modifier = Modifier
+) {
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
 
     LaunchedEffect(userId) {
-        viewModel.retrieveData(userId)
+        viewModel.retrieveData()
     }
 
     when (status) {
@@ -254,11 +187,19 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
         }
         PlayerApiStatus.SUCCESS -> {
             LazyVerticalGrid(
-                modifier = modifier.fillMaxSize().padding(4.dp),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(4.dp),
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
-                items(data) { ListItem(player = it, userId = userId, onDelete = { id -> viewModel.deleteData(userId, id)}) }
+                items(data) { player ->
+                    ListItemHome(
+                        player = player,
+                        userId = userId,
+                        onDelete = { id -> viewModel.deleteData(userId, id) }
+                    )
+                }
             }
         }
         PlayerApiStatus.FAILED -> {
@@ -282,7 +223,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListItem(
+fun ListItemHome(
     player: Player,
     userId: String,
     onDelete: (String) -> Unit
@@ -306,13 +247,13 @@ fun ListItem(
                     .fillMaxWidth()
             ) {
                 Text(
-                    "Tindakan Pemain",
+                    "Player Actions",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    "Pilih tindakan untuk \"${player.nama}\"",
+                    "Choose action for \"${player.nama}\"",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -331,7 +272,7 @@ fun ListItem(
                 ) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit")
                     Spacer(Modifier.width(8.dp))
-                    Text("Edit Pemain")
+                    Text("Edit Player")
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -347,14 +288,14 @@ fun ListItem(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Hapus")
+                    Icon(Icons.Default.Delete, contentDescription = "Delete")
                     Spacer(Modifier.width(8.dp))
-                    Text("Hapus Pemain")
+                    Text("Delete Player")
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
                 TextButton(onClick = { showSheet = false }) {
-                    Text("Tutup")
+                    Text("Close")
                 }
             }
         }
@@ -363,19 +304,19 @@ fun ListItem(
     if (showConfirmDelete) {
         AlertDialog(
             onDismissRequest = { showConfirmDelete = false },
-            title = { Text("Konfirmasi Hapus") },
-            text = { Text("Apakah Anda yakin ingin menghapus pemain ini?") },
+            title = { Text("Confirm Delete") },
+            text = { Text("Are you sure you want to delete this player?") },
             confirmButton = {
                 Button(onClick = {
                     showConfirmDelete = false
                     onDelete(player.id)
                 }) {
-                    Text("Ya")
+                    Text("Yes")
                 }
             },
             dismissButton = {
                 Button(onClick = { showConfirmDelete = false }) {
-                    Text("Tidak")
+                    Text("No")
                 }
             }
         )
@@ -416,7 +357,7 @@ fun ListItem(
                         .data(PlayerApi.getPlayerPhotoUrl(player.foto))
                         .crossfade(true)
                         .build(),
-                    contentDescription = stringResource(R.string.gambar, player.nama),
+                    contentDescription = stringResource(R.string.player_image, player.nama),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(id = R.drawable.loading_img),
                     error = painterResource(id = R.drawable.broken_img),
@@ -433,7 +374,7 @@ fun ListItem(
                             .size(36.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.MoreVert,
+                            imageVector = Icons.Default.Edit,
                             contentDescription = "Menu",
                             tint = Color.White
                         )
@@ -506,25 +447,6 @@ private suspend fun signOut(context: Context, dataStore: UserDataStore) {
     }
 }
 
-private fun getCroppedImage(
-    resolver: ContentResolver,
-    result: CropImageView.CropResult
-): Bitmap? {
-    if (!result.isSuccessful) {
-        Log.e("IMAGE", "Error: ${result.error}")
-        return null
-    }
-
-    val uri = result.uriContent ?: return null
-
-    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-        MediaStore.Images.Media.getBitmap(resolver, uri)
-    } else {
-        val source = ImageDecoder.createSource(resolver, uri)
-        ImageDecoder.decodeBitmap(source)
-    }
-}
-
 private suspend fun loadBitmapFromUrl(context: Context, url: String): Bitmap? {
     val loader = ImageLoader(context)
     val request = ImageRequest.Builder(context)
@@ -540,32 +462,32 @@ private suspend fun loadBitmapFromUrl(context: Context, url: String): Bitmap? {
     }
 }
 
-@Composable
-fun rememberBitmapFromUrl(url: String): Bitmap? {
-    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-
-    LaunchedEffect(url) {
-        withContext(Dispatchers.IO) {
-            try {
-                val connection = URL(url).openConnection() as HttpURLConnection
-                connection.doInput = true
-                connection.connect()
-                val input: InputStream = connection.inputStream
-                bitmap = BitmapFactory.decodeStream(input)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    return bitmap
-}
+//@Composable
+//fun rememberBitmapFromUrl(url: String): Bitmap? {
+//    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+//
+//    LaunchedEffect(url) {
+//        withContext(Dispatchers.IO) {
+//            try {
+//                val connection = URL(url).openConnection() as HttpURLConnection
+//                connection.doInput = true
+//                connection.connect()
+//                val input: InputStream = connection.inputStream
+//                bitmap = BitmapFactory.decodeStream(input)
+//            } catch (e: IOException) {
+//                e.printStackTrace()
+//            }
+//        }
+//    }
+//
+//    return bitmap
+//}
 
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
-fun MainScreenPreview() {
+fun HomeScreenPreview() {
     Assessment3Theme {
-        MainScreen()
+        HomeScreen()
     }
 }
