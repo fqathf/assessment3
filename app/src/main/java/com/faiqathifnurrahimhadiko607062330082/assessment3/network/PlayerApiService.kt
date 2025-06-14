@@ -34,7 +34,7 @@ interface PlayerApiService {
     ): List<Player>
 
     @Multipart
-    @POST("players/store")
+    @POST("players")
     suspend fun addPlayer(
         @Header("Authorization") authToken: String,
         @Part("nama") nama: RequestBody,
@@ -65,8 +65,13 @@ object PlayerApi {
     }
 
     fun getPlayerPhotoUrl(photoId: String): String {
-        return "https://apimobpromobil-production.up.railway.app/storage/$photoId"
+        return if (photoId.startsWith("http", ignoreCase = true)) {
+            photoId
+        } else {
+            "https://apimobpromobil-production.up.railway.app/storage/$photoId"
+        }
     }
+
 }
 
 enum class PlayerApiStatus { LOADING, SUCCESS, FAILED }

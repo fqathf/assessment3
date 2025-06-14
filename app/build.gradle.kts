@@ -11,7 +11,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.faiqathifnurrahimhadiko607062330082.assesment3"
+        applicationId = "com.faiqathifnurrahimhadiko607062330082.assessment3"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -114,7 +115,7 @@ fun HomeScreen() {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.app_name))
+                    Text(text = "Liverpool Players")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -364,7 +365,7 @@ fun ListItemHome(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                if (userId.isNotEmpty()) {
+                if (userId.isNotEmpty() && player.Authorization == userId) {
                     IconButton(
                         onClick = { showSheet = true },
                         modifier = Modifier
@@ -374,7 +375,7 @@ fun ListItemHome(
                             .size(36.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Edit,
+                            imageVector = Icons.Default.MoreVert,
                             contentDescription = "Menu",
                             tint = Color.White
                         )

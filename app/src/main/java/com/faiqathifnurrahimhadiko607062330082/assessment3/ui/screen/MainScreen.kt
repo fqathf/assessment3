@@ -141,7 +141,7 @@ fun MainScreen() {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.app_name))
+                    Text(text = "Liverpool Players")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -399,59 +399,60 @@ fun ListItem(
             }
         )
     }
+    if (userId.isNotEmpty() && player.Authorization == userId){
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(8.dp),
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Column {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(PlayerApi.getPlayerPhotoUrl(player.foto))
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = stringResource(R.string.gambar, player.nama),
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(id = R.drawable.loading_img),
+                        error = painterResource(id = R.drawable.broken_img),
+                        modifier = Modifier.fillMaxSize()
+                    )
 
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
-        modifier = Modifier.padding(8.dp)
-    ) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(PlayerApi.getPlayerPhotoUrl(player.foto))
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = stringResource(R.string.gambar, player.nama),
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = R.drawable.loading_img),
-                    error = painterResource(id = R.drawable.broken_img),
-                    modifier = Modifier.fillMaxSize()
-                )
-
-                if (userId.isNotEmpty()) {
-                    IconButton(
-                        onClick = { showSheet = true },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(8.dp)
-                            .background(Color(0f, 0f, 0f, 0.4f), shape = CircleShape)
-                            .size(36.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Menu",
-                            tint = Color.White
-                        )
+                    if (userId.isNotEmpty() && player.Authorization == userId) {
+                        IconButton(
+                            onClick = { showSheet = true },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(8.dp)
+                                .background(Color(0f, 0f, 0f, 0.4f), shape = CircleShape)
+                                .size(36.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Menu",
+                                tint = Color.White
+                            )
+                        }
                     }
                 }
-            }
 
-            Column(modifier = Modifier.padding(12.dp)) {
-                Text(
-                    text = player.nama,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = player.posisi,
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = player.nama,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = player.posisi,
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
             }
         }
     }
