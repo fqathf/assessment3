@@ -234,7 +234,7 @@ fun ListItemHome(
     var showEditDialog by remember { mutableStateOf(false) }
 
     val viewModel: MainViewModel = viewModel()
-    val bitmap = rememberBitmapFromUrl(PlayerApi.getPlayerPhotoUrl(player.foto))
+    val bitmap = rememberBitmapFromUrlHome(PlayerApi.getPlayerPhotoUrl(player.foto))
 
     if (showSheet) {
         ModalBottomSheet(
@@ -462,26 +462,26 @@ private suspend fun loadBitmapFromUrl(context: Context, url: String): Bitmap? {
     }
 }
 
-//@Composable
-//fun rememberBitmapFromUrl(url: String): Bitmap? {
-//    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-//
-//    LaunchedEffect(url) {
-//        withContext(Dispatchers.IO) {
-//            try {
-//                val connection = URL(url).openConnection() as HttpURLConnection
-//                connection.doInput = true
-//                connection.connect()
-//                val input: InputStream = connection.inputStream
-//                bitmap = BitmapFactory.decodeStream(input)
-//            } catch (e: IOException) {
-//                e.printStackTrace()
-//            }
-//        }
-//    }
-//
-//    return bitmap
-//}
+@Composable
+fun rememberBitmapFromUrlHome(url: String): Bitmap? {
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+    LaunchedEffect(url) {
+        withContext(Dispatchers.IO) {
+            try {
+                val connection = URL(url).openConnection() as HttpURLConnection
+                connection.doInput = true
+                connection.connect()
+                val input: InputStream = connection.inputStream
+                bitmap = BitmapFactory.decodeStream(input)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    return bitmap
+}
 
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
