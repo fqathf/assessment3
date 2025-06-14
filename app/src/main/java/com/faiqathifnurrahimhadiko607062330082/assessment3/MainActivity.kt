@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.faiqathifnurrahimhadiko607062330082.assessment3.navigation.AppNavigation
 // Impor MainScreen. Sesuaikan path jika berbeda.
 import com.faiqathifnurrahimhadiko607062330082.assessment3.ui.screen.MainScreen
 import com.faiqathifnurrahimhadiko607062330082.assessment3.ui.theme.Assessment3Theme // Ganti dengan nama tema Anda
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen() // Memanggil MainScreen
+                    AppNavigation() // Memanggil MainScreen
                 }
             }
         }

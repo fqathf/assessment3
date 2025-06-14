@@ -17,7 +17,7 @@ val Context.dataStore : DataStore<Preferences> by preferencesDataStore(
 class UserDataStore(private val context: Context) {
 
     companion object {
-        private val USER_NAME = stringPreferencesKey("name")
+        private val USER_NAME = stringPreferencesKey("user_name")
         private val USER_EMAIL = stringPreferencesKey("email")
         private val USER_PHOTO = stringPreferencesKey("photoUrl")
     }
@@ -38,9 +38,9 @@ class UserDataStore(private val context: Context) {
         }
     }
 
-    suspend fun clearData() {
-        context.dataStore.edit { preferences ->
-            preferences.clear() // Menghapus semua preferensi pengguna
-        }
-    }
+//    suspend fun clearData() {
+//        context.dataStore.edit { preferences ->
+//            preferences.clear() // Menghapus semua preferensi pengguna
+//        }
+//    }
 }

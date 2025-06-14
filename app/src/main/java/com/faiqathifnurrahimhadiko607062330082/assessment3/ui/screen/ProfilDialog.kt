@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -31,12 +33,13 @@ import com.faiqathifnurrahimhadiko607062330082.assessment3.R
 import com.faiqathifnurrahimhadiko607062330082.assessment3.model.User
 import com.faiqathifnurrahimhadiko607062330082.assessment3.ui.theme.Assessment3Theme
 
+
 @Composable
 fun ProfilDialog(
     user: User,
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
-) {
+){
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier.padding(16.dp),
@@ -53,9 +56,12 @@ fun ProfilDialog(
                         .build(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = R.drawable.loading_img),
+                    placeholder = painterResource(id =  R.drawable.loading_img),
                     error = painterResource(id = R.drawable.broken_img),
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+
                 )
                 Text(
                     text = user.name,
@@ -67,18 +73,17 @@ fun ProfilDialog(
                 Text(
                     text = user.email,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                    horizontalArrangement = Arrangement.Center
+                ){
                     OutlinedButton(
                         onClick = { onDismissRequest() },
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(8.dp)
                     ) {
-                        Text(stringResource(R.string.tutup))
+                        Text(stringResource(id = R.string.tutup))
                     }
                     OutlinedButton(
                         onClick = { onConfirmation() },
@@ -86,7 +91,7 @@ fun ProfilDialog(
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
                     ) {
                         Text(
-                            stringResource(R.string.logout),
+                            text = stringResource(R.string.logout),
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -99,10 +104,10 @@ fun ProfilDialog(
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
-fun DialogPreview() {
+fun DialogPreview(){
     Assessment3Theme {
         ProfilDialog(
-            user = User("Indra Azimi", "indraazimi@yahoo.com", ""),
+            user = User("Egi Danuajisantos","egidanusantoso@gmail.com",""),
             onDismissRequest = { },
             onConfirmation = { }
         )

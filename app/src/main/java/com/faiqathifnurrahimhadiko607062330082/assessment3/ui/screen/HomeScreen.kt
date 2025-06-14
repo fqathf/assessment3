@@ -414,7 +414,7 @@ private suspend fun signIn(context: Context, dataStore: UserDataStore) {
         val result = credentialManager.getCredential(context, request)
         handleSignIn(result, dataStore)
     } catch (e: GetCredentialException) {
-        Log.e("SIGN-IN", "Error: ${e.errorMessage}")
+        Log.e("SIGN-IN", "AAA: ${e.errorMessage}")
     }
 }
 
@@ -428,7 +428,7 @@ private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserD
             val photoUrl = googleId.profilePictureUri.toString()
             dataStore.saveData(User(nama, email, photoUrl))
         } catch (e: GoogleIdTokenParsingException) {
-            Log.e("SIGN-IN", "Error: ${e.message}")
+            Log.e("SIGN-IN", "BBB: ${e.message}")
         }
     } else {
         Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
@@ -443,7 +443,7 @@ private suspend fun signOut(context: Context, dataStore: UserDataStore) {
         )
         dataStore.saveData(User())
     } catch (e: ClearCredentialException) {
-        Log.e("SIGN-IN", "Error: ${e.errorMessage}")
+        Log.e("SIGN-IN", "CCC: ${e.errorMessage}")
     }
 }
 

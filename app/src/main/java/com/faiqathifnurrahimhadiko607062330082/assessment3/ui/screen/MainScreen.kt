@@ -100,7 +100,6 @@ import com.faiqathifnurrahimhadiko607062330082.assessment3.ui.theme.Assessment3T
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -151,7 +150,7 @@ fun MainScreen() {
                 actions = {
                     IconButton(onClick = {
                         if (user.email.isEmpty()) {
-                            CoroutineScope(Dispatchers.IO).launch {
+                            coroutineScope.launch {
                                 signIn(context, dataStore)
                             }
                         } else {
@@ -212,8 +211,9 @@ fun MainScreen() {
         if (showDialog) {
             ProfilDialog(
                 user = user,
-                onDismissRequest = { showDialog = false }) {
-                CoroutineScope(Dispatchers.IO).launch { signOut(context, dataStore) }
+                onDismissRequest = { showDialog = false }
+            ) {
+                coroutineScope.launch { signOut(context, dataStore) }
                 showDialog = false
             }
         }
@@ -458,68 +458,71 @@ fun ListItem(
 }
 
 // Helper functions (same as original)
-private suspend fun signIn(context: Context, dataStore: UserDataStore) {
-    val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+private suspend fun signIn(context: Context , dataStore: UserDataStore){
+    val googleOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
         .setFilterByAuthorizedAccounts(false)
         .setServerClientId(BuildConfig.API_KEY)
         .build()
 
     val request: GetCredentialRequest = GetCredentialRequest.Builder()
-        .addCredentialOption(googleIdOption)
+        .addCredentialOption(googleOption)
         .build()
 
     try {
         val credentialManager = CredentialManager.create(context)
         val result = credentialManager.getCredential(context, request)
         handleSignIn(result, dataStore)
-    } catch (e: GetCredentialException) {
+    }catch (e: GetCredentialException){
         Log.e("SIGN-IN", "Error: ${e.errorMessage}")
     }
 }
 
-private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserDataStore) {
+private suspend fun handleSignIn(
+    result: GetCredentialResponse,
+    dataStore: UserDataStore
+){
     val credential = result.credential
-    if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+    if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL){
         try {
             val googleId = GoogleIdTokenCredential.createFrom(credential.data)
             val nama = googleId.displayName ?: ""
             val email = googleId.id
-            val photoUrl = googleId.profilePictureUri.toString()
+            val photoUrl = googleId.profilePictureUri?.toString() ?: ""
             dataStore.saveData(User(nama, email, photoUrl))
-        } catch (e: GoogleIdTokenParsingException) {
+        } catch (e: GoogleIdTokenParsingException){
             Log.e("SIGN-IN", "Error: ${e.message}")
         }
-    } else {
+    }
+    else{
         Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
     }
 }
 
-private suspend fun signOut(context: Context, dataStore: UserDataStore) {
+private suspend fun signOut(context: Context , dataStore: UserDataStore){
     try {
         val credentialManager = CredentialManager.create(context)
         credentialManager.clearCredentialState(
             ClearCredentialStateRequest()
         )
         dataStore.saveData(User())
-    } catch (e: ClearCredentialException) {
-        Log.e("SIGN-IN", "Error: ${e.errorMessage}")
+    }catch (e: ClearCredentialException){
+        Log.e("SIGN-OUT", "Error: ${e.errorMessage}")
     }
 }
 
 private fun getCroppedImage(
-    resolver: ContentResolver,
+    resolver : ContentResolver,
     result: CropImageView.CropResult
-): Bitmap? {
-    if (!result.isSuccessful) {
+): Bitmap?{
+    if (!result.isSuccessful){
         Log.e("IMAGE", "Error: ${result.error}")
         return null
     }
-
     val uri = result.uriContent ?: return null
 
-    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P){
         MediaStore.Images.Media.getBitmap(resolver, uri)
-    } else {
+    }else{
         val source = ImageDecoder.createSource(resolver, uri)
         ImageDecoder.decodeBitmap(source)
     }
