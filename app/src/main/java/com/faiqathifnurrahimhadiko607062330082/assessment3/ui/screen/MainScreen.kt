@@ -71,7 +71,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -138,29 +137,22 @@ fun MainScreen() {
     }
 
     Scaffold(
+        // ... di dalam HomeScreen() dan MainScreen() Scaffold
         topBar = {
             TopAppBar(
                 title = {
                     Text(text = "Liverpool Players")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary, // Menggunakan warna utama
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary, // Warna teks di atas warna utama
                 ),
                 actions = {
-                    IconButton(onClick = {
-                        if (user.email.isEmpty()) {
-                            coroutineScope.launch {
-                                signIn(context, dataStore)
-                            }
-                        } else {
-                            showDialog = true
-                        }
-                    }) {
+                    IconButton(onClick = { /* ... */ }) {
                         Icon(
                             painter = painterResource(id = R.drawable.account_circle_24),
                             contentDescription = stringResource(id = R.string.profil),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.onPrimary // Ikon juga menggunakan warna onPrimary
                         )
                     }
                 }
@@ -324,32 +316,31 @@ fun ListItem(
                         showEditDialog = true
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFF1F5FF),
-                        contentColor = Color(0xFF4C33FF)
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit")
                     Spacer(Modifier.width(8.dp))
-                    Text("Edit Pemain")
+                    Text("Edit Player")
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
+                // Tombol Hapus
                 Button(
                     onClick = {
                         showSheet = false
                         showConfirmDelete = true
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFF1F1),
-                        contentColor = Color.Red
+                        containerColor = MaterialTheme.colorScheme.error, // Gunakan warna error dari tema
+                        contentColor = MaterialTheme.colorScheme.onError
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Hapus")
+                    Icon(Icons.Default.Delete, contentDescription = "Delete")
                     Spacer(Modifier.width(8.dp))
-                    Text("Hapus Pemain")
+                    Text("Delete Player")
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -401,9 +392,12 @@ fun ListItem(
     }
     if (userId.isNotEmpty() && player.Authorization == userId){
         Card(
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
-            modifier = Modifier.padding(8.dp)
+            shape = RoundedCornerShape(12.dp), // Sedikit mengurangi radius sudut
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // Mengurangi bayangan
+            modifier = Modifier.padding(8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface // Menggunakan warna surface dari tema
+            )
         ) {
             Column {
                 Box(
@@ -429,7 +423,7 @@ fun ListItem(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(8.dp)
-                                .background(Color(0f, 0f, 0f, 0.4f), shape = CircleShape)
+                                .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
                                 .size(36.dp)
                         ) {
                             Icon(
@@ -441,16 +435,18 @@ fun ListItem(
                     }
                 }
 
-                Column(modifier = Modifier.padding(12.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) { // Menambahkan padding
                     Text(
                         text = player.nama,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleLarge, // Membuat judul lebih besar
+                        color = MaterialTheme.colorScheme.onSurface
                     )
+                    Spacer(modifier = Modifier.height(4.dp)) // Spasi antara nama dan posisi
                     Text(
                         text = player.posisi,
-                        fontSize = 14.sp,
-                        color = Color.Gray
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f) // Warna teks sekunder
                     )
                 }
             }

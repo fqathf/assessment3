@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -51,7 +50,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,21 +61,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.ClearCredentialException
-import androidx.credentials.exceptions.GetCredentialException
 import androidx.datastore.core.IOException
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import coil.request.SuccessResult
-import com.faiqathifnurrahimhadiko607062330082.assessment3.BuildConfig
 import com.faiqathifnurrahimhadiko607062330082.assessment3.R
 import com.faiqathifnurrahimhadiko607062330082.assessment3.model.Player
 import com.faiqathifnurrahimhadiko607062330082.assessment3.model.User
@@ -85,9 +75,6 @@ import com.faiqathifnurrahimhadiko607062330082.assessment3.network.PlayerApi
 import com.faiqathifnurrahimhadiko607062330082.assessment3.network.PlayerApiStatus
 import com.faiqathifnurrahimhadiko607062330082.assessment3.network.UserDataStore
 import com.faiqathifnurrahimhadiko607062330082.assessment3.ui.theme.Assessment3Theme
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -105,36 +92,29 @@ fun HomeScreen() {
 
     val viewModel: MainViewModel = viewModel()
     val errorMessage by viewModel.errorMessage
-    val itemToEdit by remember { mutableStateOf<Player?>(null) }
-    var bitmapToEdit by remember { mutableStateOf<Bitmap?>(null) }
-    val coroutineScope = rememberCoroutineScope()
+//    val itemToEdit by remember { mutableStateOf<Player?>(null) }
+//    var bitmapToEdit by remember { mutableStateOf<Bitmap?>(null) }
+//    val coroutineScope = rememberCoroutineScope()
 
     var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
+        // ... di dalam HomeScreen() dan MainScreen() Scaffold
         topBar = {
             TopAppBar(
                 title = {
                     Text(text = "Liverpool Players")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary, // Menggunakan warna utama
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary, // Warna teks di atas warna utama
                 ),
                 actions = {
-                    IconButton(onClick = {
-                        if (user.email.isEmpty()) {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                signIn(context, dataStore)
-                            }
-                        } else {
-                            showDialog = true
-                        }
-                    }) {
+                    IconButton(onClick = { /* ... */ }) {
                         Icon(
                             painter = painterResource(id = R.drawable.account_circle_24),
                             contentDescription = stringResource(id = R.string.profil),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.onPrimary // Ikon juga menggunakan warna onPrimary
                         )
                     }
                 }
@@ -266,8 +246,8 @@ fun ListItemHome(
                         showEditDialog = true
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFF1F5FF),
-                        contentColor = Color(0xFF4C33FF)
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -276,16 +256,14 @@ fun ListItemHome(
                     Text("Edit Player")
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
                 Button(
                     onClick = {
                         showSheet = false
                         showConfirmDelete = true
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFF1F1),
-                        contentColor = Color.Red
+                        containerColor = MaterialTheme.colorScheme.error, // Gunakan warna error dari tema
+                        contentColor = MaterialTheme.colorScheme.onError
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -343,9 +321,12 @@ fun ListItemHome(
     }
 
     Card(
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
-        modifier = Modifier.padding(8.dp)
+        shape = RoundedCornerShape(12.dp), // Sedikit mengurangi radius sudut
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // Mengurangi bayangan
+        modifier = Modifier.padding(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface // Menggunakan warna surface dari tema
+        )
     ) {
         Column {
             Box(
@@ -371,7 +352,7 @@ fun ListItemHome(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(8.dp)
-                            .background(Color(0f, 0f, 0f, 0.4f), shape = CircleShape)
+                            .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
                             .size(36.dp)
                     ) {
                         Icon(
@@ -383,16 +364,18 @@ fun ListItemHome(
                 }
             }
 
-            Column(modifier = Modifier.padding(12.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = player.nama,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleLarge, // Membuat judul lebih besar
+                    color = MaterialTheme.colorScheme.onSurface
                 )
+                Spacer(modifier = Modifier.height(4.dp)) // Spasi antara nama dan posisi
                 Text(
                     text = player.posisi,
-                    fontSize = 14.sp,
-                    color = Color.Gray
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f) // Warna teks sekunder
                 )
             }
         }
@@ -400,41 +383,41 @@ fun ListItemHome(
 }
 
 // Helper functions (same as original)
-private suspend fun signIn(context: Context, dataStore: UserDataStore) {
-    val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-        .setFilterByAuthorizedAccounts(false)
-        .setServerClientId(BuildConfig.API_KEY)
-        .build()
+//private suspend fun signIn(context: Context, dataStore: UserDataStore) {
+//    val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+//        .setFilterByAuthorizedAccounts(false)
+//        .setServerClientId(BuildConfig.API_KEY)
+//        .build()
+//
+//    val request: GetCredentialRequest = GetCredentialRequest.Builder()
+//        .addCredentialOption(googleIdOption)
+//        .build()
+//
+//    try {
+//        val credentialManager = CredentialManager.create(context)
+//        val result = credentialManager.getCredential(context, request)
+//        handleSignIn(result, dataStore)
+//    } catch (e: GetCredentialException) {
+//        Log.e("SIGN-IN", "AAA: ${e.errorMessage}")
+//    }
+//}
 
-    val request: GetCredentialRequest = GetCredentialRequest.Builder()
-        .addCredentialOption(googleIdOption)
-        .build()
-
-    try {
-        val credentialManager = CredentialManager.create(context)
-        val result = credentialManager.getCredential(context, request)
-        handleSignIn(result, dataStore)
-    } catch (e: GetCredentialException) {
-        Log.e("SIGN-IN", "AAA: ${e.errorMessage}")
-    }
-}
-
-private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserDataStore) {
-    val credential = result.credential
-    if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-        try {
-            val googleId = GoogleIdTokenCredential.createFrom(credential.data)
-            val nama = googleId.displayName ?: ""
-            val email = googleId.id
-            val photoUrl = googleId.profilePictureUri.toString()
-            dataStore.saveData(User(nama, email, photoUrl))
-        } catch (e: GoogleIdTokenParsingException) {
-            Log.e("SIGN-IN", "BBB: ${e.message}")
-        }
-    } else {
-        Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
-    }
-}
+//private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserDataStore) {
+//    val credential = result.credential
+//    if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+//        try {
+//            val googleId = GoogleIdTokenCredential.createFrom(credential.data)
+//            val nama = googleId.displayName ?: ""
+//            val email = googleId.id
+//            val photoUrl = googleId.profilePictureUri.toString()
+//            dataStore.saveData(User(nama, email, photoUrl))
+//        } catch (e: GoogleIdTokenParsingException) {
+//            Log.e("SIGN-IN", "BBB: ${e.message}")
+//        }
+//    } else {
+//        Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
+//    }
+//}
 
 private suspend fun signOut(context: Context, dataStore: UserDataStore) {
     try {
@@ -448,20 +431,20 @@ private suspend fun signOut(context: Context, dataStore: UserDataStore) {
     }
 }
 
-private suspend fun loadBitmapFromUrl(context: Context, url: String): Bitmap? {
-    val loader = ImageLoader(context)
-    val request = ImageRequest.Builder(context)
-        .data(url)
-        .allowHardware(false)
-        .build()
-    return try {
-        val result = (loader.execute(request) as SuccessResult).drawable
-        (result as BitmapDrawable).bitmap
-    } catch (e: Exception) {
-        Log.e("LoadBitmap", "Failed to load bitmap from URL: $url", e)
-        null
-    }
-}
+//private suspend fun loadBitmapFromUrl(context: Context, url: String): Bitmap? {
+//    val loader = ImageLoader(context)
+//    val request = ImageRequest.Builder(context)
+//        .data(url)
+//        .allowHardware(false)
+//        .build()
+//    return try {
+//        val result = (loader.execute(request) as SuccessResult).drawable
+//        (result as BitmapDrawable).bitmap
+//    } catch (e: Exception) {
+//        Log.e("LoadBitmap", "Failed to load bitmap from URL: $url", e)
+//        null
+//    }
+//}
 
 @Composable
 fun rememberBitmapFromUrlHome(url: String): Bitmap? {
