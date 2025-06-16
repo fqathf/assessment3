@@ -110,15 +110,14 @@ fun HomeScreen() {
     var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        // ... di dalam HomeScreen() dan MainScreen() Scaffold
         topBar = {
             TopAppBar(
                 title = {
                     Text(text = "Liverpool Players")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary, // Menggunakan warna utama
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary, // Warna teks di atas warna utama
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 actions = {
                     IconButton(onClick = {

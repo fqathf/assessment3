@@ -138,15 +138,14 @@ fun MainScreen() {
     }
 
     Scaffold(
-        // ... di dalam HomeScreen() dan MainScreen() Scaffold
         topBar = {
             TopAppBar(
                 title = {
                     Text(text = "Liverpool Players")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary, // Menggunakan warna utama
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary, // Warna teks di atas warna utama
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 actions = {
                     IconButton(onClick = {
@@ -161,7 +160,7 @@ fun MainScreen() {
                         Icon(
                             painter = painterResource(id = R.drawable.account_circle_24),
                             contentDescription = stringResource(id = R.string.profil),
-                            tint = MaterialTheme.colorScheme.onPrimary // Ikon juga menggunakan warna onPrimary
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -401,11 +400,11 @@ fun ListItem(
     }
     if (userId.isNotEmpty() && player.Authorization == userId){
         Card(
-            shape = RoundedCornerShape(12.dp), // Sedikit mengurangi radius sudut
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // Mengurangi bayangan
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             modifier = Modifier.padding(8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface // Menggunakan warna surface dari tema
+                containerColor = MaterialTheme.colorScheme.surface
             )
         ) {
             Column {
@@ -426,7 +425,7 @@ fun ListItem(
                         modifier = Modifier.fillMaxSize()
                     )
 
-                    if (userId.isNotEmpty() && player.Authorization == userId) {
+                    if (userId.isNotEmpty()) {
                         IconButton(
                             onClick = { showSheet = true },
                             modifier = Modifier
