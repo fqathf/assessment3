@@ -99,6 +99,7 @@ import com.faiqathifnurrahimhadiko607062330082.assessment3.ui.theme.Assessment3T
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -148,7 +149,15 @@ fun MainScreen() {
                     titleContentColor = MaterialTheme.colorScheme.onPrimary, // Warna teks di atas warna utama
                 ),
                 actions = {
-                    IconButton(onClick = { /* ... */ }) {
+                    IconButton(onClick = {
+                        if (user.email.isEmpty()) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                signIn(context, dataStore)
+                            }
+                        } else {
+                            showDialog = true
+                        }
+                    }) {
                         Icon(
                             painter = painterResource(id = R.drawable.account_circle_24),
                             contentDescription = stringResource(id = R.string.profil),

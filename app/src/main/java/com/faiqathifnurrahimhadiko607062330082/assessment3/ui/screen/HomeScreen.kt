@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -63,11 +64,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.ClearCredentialException
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.datastore.core.IOException
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.request.SuccessResult
+import com.faiqathifnurrahimhadiko607062330082.assessment3.BuildConfig
 import com.faiqathifnurrahimhadiko607062330082.assessment3.R
 import com.faiqathifnurrahimhadiko607062330082.assessment3.model.Player
 import com.faiqathifnurrahimhadiko607062330082.assessment3.model.User
@@ -75,6 +83,9 @@ import com.faiqathifnurrahimhadiko607062330082.assessment3.network.PlayerApi
 import com.faiqathifnurrahimhadiko607062330082.assessment3.network.PlayerApiStatus
 import com.faiqathifnurrahimhadiko607062330082.assessment3.network.UserDataStore
 import com.faiqathifnurrahimhadiko607062330082.assessment3.ui.theme.Assessment3Theme
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -110,7 +121,15 @@ fun HomeScreen() {
                     titleContentColor = MaterialTheme.colorScheme.onPrimary, // Warna teks di atas warna utama
                 ),
                 actions = {
-                    IconButton(onClick = { /* ... */ }) {
+                    IconButton(onClick = {
+                        if (user.email.isEmpty()) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                signIn(context, dataStore)
+                            }
+                        } else {
+                            showDialog = true
+                        }
+                    }) {
                         Icon(
                             painter = painterResource(id = R.drawable.account_circle_24),
                             contentDescription = stringResource(id = R.string.profil),
@@ -383,41 +402,41 @@ fun ListItemHome(
 }
 
 // Helper functions (same as original)
-//private suspend fun signIn(context: Context, dataStore: UserDataStore) {
-//    val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-//        .setFilterByAuthorizedAccounts(false)
-//        .setServerClientId(BuildConfig.API_KEY)
-//        .build()
-//
-//    val request: GetCredentialRequest = GetCredentialRequest.Builder()
-//        .addCredentialOption(googleIdOption)
-//        .build()
-//
-//    try {
-//        val credentialManager = CredentialManager.create(context)
-//        val result = credentialManager.getCredential(context, request)
-//        handleSignIn(result, dataStore)
-//    } catch (e: GetCredentialException) {
-//        Log.e("SIGN-IN", "AAA: ${e.errorMessage}")
-//    }
-//}
+private suspend fun signIn(context: Context, dataStore: UserDataStore) {
+    val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+        .setFilterByAuthorizedAccounts(false)
+        .setServerClientId(BuildConfig.API_KEY)
+        .build()
 
-//private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserDataStore) {
-//    val credential = result.credential
-//    if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-//        try {
-//            val googleId = GoogleIdTokenCredential.createFrom(credential.data)
-//            val nama = googleId.displayName ?: ""
-//            val email = googleId.id
-//            val photoUrl = googleId.profilePictureUri.toString()
-//            dataStore.saveData(User(nama, email, photoUrl))
-//        } catch (e: GoogleIdTokenParsingException) {
-//            Log.e("SIGN-IN", "BBB: ${e.message}")
-//        }
-//    } else {
-//        Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
-//    }
-//}
+    val request: GetCredentialRequest = GetCredentialRequest.Builder()
+        .addCredentialOption(googleIdOption)
+        .build()
+
+    try {
+        val credentialManager = CredentialManager.create(context)
+        val result = credentialManager.getCredential(context, request)
+        handleSignIn(result, dataStore)
+    } catch (e: GetCredentialException) {
+        Log.e("SIGN-IN", "AAA: ${e.errorMessage}")
+    }
+}
+
+private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserDataStore) {
+    val credential = result.credential
+    if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+        try {
+            val googleId = GoogleIdTokenCredential.createFrom(credential.data)
+            val nama = googleId.displayName ?: ""
+            val email = googleId.id
+            val photoUrl = googleId.profilePictureUri.toString()
+            dataStore.saveData(User(nama, email, photoUrl))
+        } catch (e: GoogleIdTokenParsingException) {
+            Log.e("SIGN-IN", "BBB: ${e.message}")
+        }
+    } else {
+        Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
+    }
+}
 
 private suspend fun signOut(context: Context, dataStore: UserDataStore) {
     try {
@@ -431,20 +450,20 @@ private suspend fun signOut(context: Context, dataStore: UserDataStore) {
     }
 }
 
-//private suspend fun loadBitmapFromUrl(context: Context, url: String): Bitmap? {
-//    val loader = ImageLoader(context)
-//    val request = ImageRequest.Builder(context)
-//        .data(url)
-//        .allowHardware(false)
-//        .build()
-//    return try {
-//        val result = (loader.execute(request) as SuccessResult).drawable
-//        (result as BitmapDrawable).bitmap
-//    } catch (e: Exception) {
-//        Log.e("LoadBitmap", "Failed to load bitmap from URL: $url", e)
-//        null
-//    }
-//}
+private suspend fun loadBitmapFromUrl(context: Context, url: String): Bitmap? {
+    val loader = ImageLoader(context)
+    val request = ImageRequest.Builder(context)
+        .data(url)
+        .allowHardware(false)
+        .build()
+    return try {
+        val result = (loader.execute(request) as SuccessResult).drawable
+        (result as BitmapDrawable).bitmap
+    } catch (e: Exception) {
+        Log.e("LoadBitmap", "Failed to load bitmap from URL: $url", e)
+        null
+    }
+}
 
 @Composable
 fun rememberBitmapFromUrlHome(url: String): Bitmap? {
